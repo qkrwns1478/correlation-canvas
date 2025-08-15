@@ -1,70 +1,50 @@
 import { NextResponse } from "next/server";
-import { AnalysisRequest, AnalysisResult } from '../../types';
+import { spawn } from 'child_process';
+import path from 'path';
+import { AnalysisRequest } from '../../types';
 
 export async function POST(req: Request) {
   try {
-    const { dataSource1, dataSource2, startDate, endDate }: AnalysisRequest = await req.json();
+    const body: AnalysisRequest = await req.json();
 
-    if (!dataSource1 || !dataSource2 || !startDate || !endDate) {
-      return NextResponse.json({ error: '필수 파라미터가 누락되었습니다.' }, { status: 400 });
-    }
-
-    if (dataSource1 === dataSource2) {
-      return NextResponse.json({ error: '서로 다른 데이터 소스를 선택해주세요.' }, { status: 400 });
-    }
-
-    const getDataSourceName = (sourceId: string): string => {
-      const mapping: Record<string, string> = {
-        'weather_seoul': '서울 날씨 (기온)',
-        'kospi_index': 'KOSPI 지수',
-        'btc_price': '비트코인 가격',
-        'covid_cases': '코로나19 확진자',
-      };
-      return mapping[sourceId] || sourceId;
-    };
-
-    const generateMockData = (sourceId: string, startDate: string, endDate: string) => {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const data = [];
-      
-      let current = new Date(start);
-      let baseValue = sourceId === 'weather_seoul' ? 10 : 
-                      sourceId === 'kospi_index' ? 2500 :
-                      sourceId === 'btc_price' ? 45000 : 1000;
-
-      while (current <= end) {
-        const randomChange = (Math.random() - 0.5) * 0.1 * baseValue;
-        baseValue = Math.max(baseValue + randomChange, baseValue * 0.8);
-        
-        data.push({
-          date: current.toISOString().split('T')[0],
-          value: Math.round(baseValue * 100) / 100
-        });
-        
-        current.setDate(current.getDate() + 1);
-      }
-      
-      return data;
-    };
-
-    // 목데이터 생성
-    const data1 = generateMockData(dataSource1, startDate, endDate);
-    const data2 = generateMockData(dataSource2, startDate, endDate);
-    const correlation = (Math.random() - 0.5) * 1.8;
-
-    const result: AnalysisResult = {
-      correlation: Math.round(correlation * 1000) / 1000,
-      data1: data1,
-      data2: data2,
-      dataSource1Name: getDataSourceName(dataSource1),
-      dataSource2Name: getDataSourceName(dataSource2)
-    };
-
-    return NextResponse.json(result, { status: 200 });
+    // Python 스크립트 경로 설정
+    const scriptPath = path.join(process.cwd(), 'api', 'analyze.py');
     
-  } catch (error) {
-    console.error('Analysis error:', error);
-    return NextResponse.json({ error: '서버 오류가 발생했습니다.' }, { status: 500 });
+    // Python 자식 프로세스 생성
+    const pythonProcess = spawn('python', [scriptPath, JSON.stringify(body)]);
+
+    let result = '';
+    let error = '';
+
+    // Python 스크립트의 표준 출력(결과) 수신
+    pythonProcess.stdout.on('data', (data) => {
+      result += data.toString();
+    });
+
+    // Python 스크립트의 표준 에러 수신
+    pythonProcess.stderr.on('data', (data) => {
+      error += data.toString();
+    });
+
+    // Promise를 사용해 비동기 프로세스 완료를 기다림
+    const executionPromise = new Promise((resolve, reject) => {
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          resolve(JSON.parse(result));
+        } else {
+          reject(new Error(error));
+        }
+      });
+    });
+
+    const analysisResult = await executionPromise;
+
+    return NextResponse.json(analysisResult, { status: 200 });
+
+  } catch (err) {
+    console.error('Analysis error:', err);
+    return NextResponse.json({ 
+      error: err instanceof Error ? err.message : '서버 오류가 발생했습니다.' 
+    }, { status: 500 });
   }
 }

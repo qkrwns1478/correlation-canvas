@@ -11,6 +11,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { AnalysisResult } from '../types';
+import InterpretationDisplay from './InterpretationDisplay';
 
 ChartJS.register(
   CategoryScale,
@@ -26,9 +27,25 @@ interface CorrelationChartProps {
   result: AnalysisResult;
 }
 
-const CorrelationChart: React.FC<CorrelationChartProps> = ({ result }) => {
-  const data = {
-    labels: result.data1.map(item => item.date),
+export default function CorrelationChart({ result }: CorrelationChartProps) {
+  const getCorrelationColor = (correlation: number) => {
+    const absCorrelation = Math.abs(correlation);
+    if (absCorrelation >= 0.7) return 'text-green-600';
+    if (absCorrelation >= 0.3) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getCorrelationStrength = (correlation: number) => {
+    const absCorrelation = Math.abs(correlation);
+    if (absCorrelation >= 0.7) return '강한 상관관계';
+    if (absCorrelation >= 0.3) return '중간 상관관계';
+    return '약한 상관관계';
+  };
+
+  const chartData = {
+    labels: result.data1.map(item => 
+      new Date(item.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+    ),
     datasets: [
       {
         label: result.dataSource1Name,
@@ -47,7 +64,7 @@ const CorrelationChart: React.FC<CorrelationChartProps> = ({ result }) => {
     ],
   };
 
-  const options = {
+  const chartOptions = {
     responsive: true,
     interaction: {
       mode: 'index' as const,
@@ -95,26 +112,28 @@ const CorrelationChart: React.FC<CorrelationChartProps> = ({ result }) => {
   };
 
   return (
-    <div className="mt-8">
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">분석 결과</h3>
-          <p className="text-sm text-gray-600">
-            상관계수: <span className={`font-bold ${
-              Math.abs(result.correlation) > 0.7 ? 'text-red-600' :
-              Math.abs(result.correlation) > 0.3 ? 'text-yellow-600' : 'text-green-600'
-            }`}>
-              {result.correlation.toFixed(4)}
-            </span>
-            {Math.abs(result.correlation) > 0.7 && ' (강한 상관관계)'}
-            {Math.abs(result.correlation) > 0.3 && Math.abs(result.correlation) <= 0.7 && ' (보통 상관관계)'}
-            {Math.abs(result.correlation) <= 0.3 && ' (약한 상관관계)'}
-          </p>
-        </div>
-        <Line data={data} options={options} />
+    <>
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">분석 결과</h3>
+        <p className="text-sm text-gray-600">
+          상관계수: <span className={`font-bold ${getCorrelationColor(result.correlation)}`}>
+            {result.correlation.toFixed(4)}
+          </span>
+          {Math.abs(result.correlation) > 0.7 && ' (강한 상관관계)'}
+          {Math.abs(result.correlation) > 0.3 && Math.abs(result.correlation) <= 0.7 && ' (보통 상관관계)'}
+          {Math.abs(result.correlation) <= 0.3 && ' (약한 상관관계)'}
+        </p>
       </div>
-    </div>
+      <Line data={chartData} options={chartOptions} />
+      
+      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        <h4 className="text-lg font-semibold text-gray-800 mb-2">💡 분석 해석</h4>
+        <InterpretationDisplay 
+          correlation={result.correlation}
+          dataSource1Name={result.dataSource1Name}
+          dataSource2Name={result.dataSource2Name}
+        />
+      </div>
+    </>
   );
-};
-
-export default CorrelationChart;
+}
