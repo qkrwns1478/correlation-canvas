@@ -12,6 +12,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { AnalysisResult } from '../types';
 import InterpretationDisplay from './InterpretationDisplay';
+import AIInsights from './AIInsights';
 
 ChartJS.register(
   CategoryScale,
@@ -133,6 +134,7 @@ export default function CorrelationChart({ result }: CorrelationChartProps) {
           dataSource1Name={result.dataSource1Name}
           dataSource2Name={result.dataSource2Name}
         />
+        <AIInsights result={result} />
       </div>
     </>
   );

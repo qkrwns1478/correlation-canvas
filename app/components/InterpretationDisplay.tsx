@@ -5,7 +5,7 @@ import {
   PresentationChartLineIcon,
   InformationCircleIcon 
 } from '@heroicons/react/24/outline';
-import { getParticle } from '../utils/korean';
+import { josa } from 'es-hangul';
 
 interface InterpretationDisplayProps {
   correlation: number;
@@ -52,7 +52,7 @@ const InterpretationDisplay: React.FC<InterpretationDisplayProps> = ({
           상관관계 요약
         </h5>
         <p className="text-gray-700">
-          <span className="font-semibold text-blue-700">{dataSource1Name}</span>{getParticle(dataSource1Name, "와", "과")} 
+          <span className="font-semibold text-blue-700">{dataSource1Name}</span>{josa.pick(dataSource1Name, "와/과")} 
           <span className="font-semibold text-indigo-700"> {dataSource2Name}</span> 사이에는 
           <span className={`font-bold ${strengthColor}`}> {direction} {strength} 상관관계</span>가 있습니다.
         </p>
