@@ -2,3 +2,6 @@ pandas==2.3.1
 numpy==1.26.4
 yfinance==0.2.65
 gradio_client==1.11.1
+fastapi==0.110.0
+uvicorn==0.22.0
+pydantic==2.5.3
