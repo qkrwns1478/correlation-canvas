@@ -102,7 +102,7 @@ class AnalysisRequest(BaseModel):
   startDate: str
   endDate: str
 
-@app.post("/api/analyze")
+@app.post("/")
 async def analyze(request: AnalysisRequest):
   try:
     start_dt = datetime.strptime(request.startDate, '%Y-%m-%d')

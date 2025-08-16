@@ -103,7 +103,7 @@ class AIRequest(BaseModel):
   aStats: Dict[str, float]
   bStats: Dict[str, float]
 
-@app.post("/api/analyze-ai")
+@app.post("/")
 async def analyze_ai(request: AIRequest):
   try:
     payload = request.dict()
