@@ -4,6 +4,7 @@ import re
 import os
 from contextlib import contextmanager
 from gradio_client import Client
+from http.server import BaseHTTPRequestHandler
 
 @contextmanager
 def suppress_stdout():
@@ -109,29 +110,33 @@ def get_fallback_interpretation(payload: dict) -> str:
   
   return f"{intro}\n{bullets}"
 
-def main():
-  try:
-    payload = json.loads(sys.argv[1])
-    
-    required_fields = ['source1', 'source2', 'r', 'n']
-    for field in required_fields:
-      if field not in payload:
-        raise ValueError(f'필수 필드 누락: {field}')
-    
+class handler(BaseHTTPRequestHandler):
+  def do_POST(self):
     try:
-      ai_interpretation = generate_ai_interpretation(payload)
-    except Exception:
-      ai_interpretation = get_fallback_interpretation(payload)
-    
-    result = {
-      'llmInterpretation': ai_interpretation
-    }
-    
-    print(json.dumps(result, ensure_ascii=False))
+      content_length = int(self.headers['Content-Length'])
+      post_data = self.rfile.read(content_length)
+      payload = json.loads(post_data.decode('utf-8'))
 
-  except Exception as e:
-    print(str(e), file=sys.stderr)
-    sys.exit(1)
+      required_fields = ['source1', 'source2', 'r', 'n']
+      for field in required_fields:
+        if field not in payload:
+          raise ValueError(f'필수 필드 누락: {field}')
 
-if __name__ == "__main__":
-  main()
+      try:
+        ai_interpretation = generate_ai_interpretation(payload)
+      except Exception:
+        ai_interpretation = get_fallback_interpretation(payload)
+
+      result = {'llmInterpretation': ai_interpretation}
+
+      self.send_response(200)
+      self.send_header('Content-type', 'application/json')
+      self.end_headers()
+      self.wfile.write(json.dumps(result, ensure_ascii=False).encode('utf-8'))
+
+    except Exception as e:
+      self.send_response(500)
+      self.send_header('Content-type', 'application/json')
+      self.end_headers()
+      error_response = {'error': str(e)}
+      self.wfile.write(json.dumps(error_response).encode('utf-8'))
