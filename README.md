@@ -4,6 +4,8 @@
 
 **Correlation Canvas**는 서로 다른 데이터 소스 간의 숨겨진 상관관계를 발견하고 시각화하는 **데이터 분석 플랫폼**입니다. 사용자는 KOSPI 지수, 비트코인 가격, 서울 날씨, 코로나19 확진자 수 등 다양한 데이터를 선택하여 특정 기간 동안의 상관관계를 분석하고, 그 결과를 직관적인 차트와 해석을 통해 확인할 수 있습니다.
 
+* 배포 링크 : [correlation-canvas.vercel.app](https://correlation-canvas.vercel.app)
+
 ---
 
 ## ✨ 주요 기능
