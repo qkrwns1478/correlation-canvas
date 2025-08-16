@@ -30,12 +30,6 @@
 
 ### Backend & AI
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=badge&logo=python&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=badge&logo=vercel&logoColor=white)
-![ChatGPT](https://img.shields.io/badge/ChatGPT-74AA9C?style=badge&logo=openai&logoColor=white)
-
-### Python Libraries
-
-![Pandas](https://img.shields.io/badge/Pandas-150458?style=badge&logo=pandas&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=badge&logo=numpy&logoColor=white)
 ![Gradio](https://img.shields.io/badge/Gradio-FF7C05?style=badge&logo=gradio&logoColor=white)
+![ChatGPT](https://img.shields.io/badge/ChatGPT-74AA9C?style=badge&logo=openai&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=badge&logo=vercel&logoColor=white)
