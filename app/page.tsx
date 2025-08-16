@@ -49,11 +49,11 @@ const dataSourceOptions = [
 
 const getDefaultDates = () => {
   const today = new Date();
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(today.getDate() - 7);
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setDate(today.getDate() - 31);
   
   return {
-    startDate: sevenDaysAgo.toISOString().split('T')[0],
+    startDate: oneMonthAgo.toISOString().split('T')[0],
     endDate: today.toISOString().split('T')[0]
   };
 };
@@ -63,8 +63,8 @@ export default function Home() {
 
   const [dataSource1, setDataSource1] = useState('');
   const [dataSource2, setDataSource2] = useState('');
-  const [startDate, setStartDate] = useState(defaultDates.startDate);  // 7일 전
-  const [endDate, setEndDate] = useState(defaultDates.endDate);        // 오늘
+  const [startDate, setStartDate] = useState(defaultDates.startDate);
+  const [endDate, setEndDate] = useState(defaultDates.endDate);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState('');

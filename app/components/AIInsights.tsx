@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AnalysisResult } from '../types';
+import LoadingSpinner from './LoadingSpinner';
 
 interface AIInsightsProps {
   result: AnalysisResult;
@@ -41,7 +42,7 @@ export default function AIInsights({ result }: AIInsightsProps) {
       });
   
       const data = await response.json();
-      
+      // console.log(data);
       if (!response.ok) {
         throw new Error(data.error || 'AI 해석 생성 실패');
       }
@@ -63,14 +64,18 @@ export default function AIInsights({ result }: AIInsightsProps) {
         <button
           onClick={requestAI}
           disabled={aiLoading}
-          className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
-          {aiLoading ? '생성 중...' : '보완 해석 생성'}
+          {aiLoading ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+              생성 중...
+            </>) : '보완 해석 생성'}
         </button>
       </div>
       
       <p className="text-sm text-gray-600 mb-4">
-        기존 통계 결과를 반복하지 않고, 데이터 품질·구간 분석·모델링 관점의 추가 제안을 제공합니다.
+        AI가 데이터 품질·구간 분석·모델링 관점의 추가 제안을 제공합니다.
       </p>
       
       {aiError && (
