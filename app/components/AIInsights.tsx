@@ -59,7 +59,7 @@ export default function AIInsights({ result }: AIInsightsProps) {
     <div className="mt-8 bg-white p-6 rounded-2xl border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-gray-800 flex items-center">
-          🧠 AI 분석 (보완 인사이트)
+          🤖 AI 추가 분석
         </h3>
         <button
           onClick={requestAI}
@@ -97,7 +97,7 @@ export default function AIInsights({ result }: AIInsightsProps) {
       </div>
       
       <p className="mt-3 text-xs text-gray-500">
-        참고: AI 해석은 통계 결과를 바탕으로 생성된 보완적 제안입니다. 추가 검증이 필요할 수 있습니다.
+        AI가 생성한 정보는 부정확하거나 불완전할 수 있으며, 최종적인 판단과 결정에 대한 책임은 사용자 본인에게 있습니다.
       </p>
     </div>
   );
