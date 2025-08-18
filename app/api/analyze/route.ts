@@ -23,7 +23,38 @@ async function fetchStockData(symbol: string, start: string, end: string): Promi
   }
 }
 
-function generateWeatherData(start: string, end: string): DataPoint[] {
+async function fetchWeatherData(start: string, end: string): Promise<DataPoint[]> {
+  const apiKey = process.env.NEXT_PUBLIC_KMA_API_HUB_KEY;
+  const startDate = start.replace(/-/g, '');
+  const endDate = end.replace(/-/g, '');
+  const stn = '108'; // 108: 서울 지점 코드
+  
+  const url = `https://apihub.kma.go.kr/api/typ01/url/kma_sfctm3.php?tm1=${startDate}&tm2=${endDate}&stn=${stn}&authKey=${apiKey}`;
+  console.log(url);
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    if (data.response?.body?.items?.item) {
+      const items = data.response.body.items.item;
+      return items.map((item: any) => ({
+        date: `${item.tm.substring(0, 4)}-${item.tm.substring(4, 6)}-${item.tm.substring(6, 8)}`,
+        value: parseFloat(item.avgTa) // 일평균 기온(avgTa) 사용
+      }));
+    }
+    console.log("No weather data found in KMA API Hub response:", data);
+    return [];
+  } catch (error) {
+    console.error(`Korea Meteorological Administration API Hub error:`, error);
+    return [];
+  }
+}
+
+function generateMockData(start: string, end: string): DataPoint[] {
   const data: DataPoint[] = [];
   let currentDate = new Date(start);
   const endDate = new Date(end);
@@ -36,14 +67,14 @@ function generateWeatherData(start: string, end: string): DataPoint[] {
 }
 
 function generateCovidData(start: string, end: string): DataPoint[] {
-  return generateWeatherData(start, end).map(d => ({...d, value: Math.max(0, Math.round(d.value * 100 + Math.random() * 200))}));
+  return generateMockData(start, end).map(d => ({...d, value: Math.max(0, Math.round(d.value * 100 + Math.random() * 200))}));
 }
 
 
 async function getDataSource(id: string, start: string, end: string): Promise<{ name: string; data: DataPoint[] }> {
   switch (id) {
     case 'weather_seoul':
-      return { name: '서울 날씨', data: generateWeatherData(start, end) };
+      return { name: '서울 날씨', data: await fetchWeatherData(start, end) };
     case 'kospi_index':
       return { name: 'KOSPI 지수', data: await fetchStockData('kospi_index', start, end) };
     case 'btc_price':

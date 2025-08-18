@@ -312,7 +312,7 @@ export default function Home() {
           <h3 className="text-xl font-bold mb-2">Correlation Canvas</h3>
           <p className="text-gray-400">데이터의 숨겨진 패턴을 발견하세요</p>
           <div className="mt-6 text-sm text-gray-500">
-            Built with Next.js, TypeScript & Tailwind CSS
+            2025 Correlation-Canvas. All rights reserved.
           </div>
         </div>
       </div>
